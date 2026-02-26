@@ -1,7 +1,10 @@
 import { PushSubscription } from 'web-push';
+import { getDatabase, subscriptions, type Subscription } from '../db/index.js';
+import { eq, desc } from 'drizzle-orm';
 
-interface Subscription {
-  id: string;
+const db = getDatabase();
+
+interface CreateSubscriptionInput {
   endpoint: string;
   keys: {
     p256dh: string;
@@ -9,57 +12,78 @@ interface Subscription {
   };
   userAgent?: string;
   metadata?: Record<string, unknown>;
-  status: 'active' | 'inactive' | 'failed';
-  createdAt: Date;
-  updatedAt: Date;
 }
-
-// In-memory storage (replace with your preferred database)
-const subscriptions = new Map<string, Subscription>();
 
 export const subscriptionService = {
   getAll: async (): Promise<Subscription[]> => {
-    return Array.from(subscriptions.values()).sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-    );
+    const result = await db
+      .select()
+      .from(subscriptions)
+      .orderBy(desc(subscriptions.createdAt));
+    return result;
   },
 
   getById: async (id: string): Promise<Subscription | undefined> => {
-    return subscriptions.get(id);
+    const result = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.id, id))
+      .limit(1);
+    return result[0];
   },
 
-  create: async (data: Omit<Subscription, 'id' | 'status' | 'createdAt' | 'updatedAt'>): Promise<Subscription> => {
-    const subscription: Subscription = {
+  create: async (data: CreateSubscriptionInput): Promise<Subscription> => {
+    const newSubscription = {
       id: crypto.randomUUID(),
-      ...data,
-      status: 'active',
+      endpoint: data.endpoint,
+      p256dh: data.keys.p256dh,
+      auth: data.keys.auth,
+      userAgent: data.userAgent,
+      metadata: data.metadata,
+      status: 'active' as const,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    subscriptions.set(subscription.id, subscription);
-    return subscription;
+
+    const result = await db
+      .insert(subscriptions)
+      .values(newSubscription)
+      .returning();
+
+    return result[0];
   },
 
   delete: async (id: string): Promise<boolean> => {
-    return subscriptions.delete(id);
+    const result = await db
+      .delete(subscriptions)
+      .where(eq(subscriptions.id, id))
+      .returning();
+    return result.length > 0;
   },
 
   updateStatus: async (id: string, status: Subscription['status']): Promise<Subscription | undefined> => {
-    const subscription = subscriptions.get(id);
-    if (!subscription) return undefined;
+    const result = await db
+      .update(subscriptions)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(subscriptions.id, id))
+      .returning();
 
-    subscription.status = status;
-    subscription.updatedAt = new Date();
-    subscriptions.set(id, subscription);
-    return subscription;
+    return result[0];
   },
 
   getActive: async (): Promise<Subscription[]> => {
-    return Array.from(subscriptions.values()).filter(s => s.status === 'active');
+    const result = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.status, 'active'));
+    return result;
   },
 
   toWebPushSubscription: (subscription: Subscription): PushSubscription => ({
     endpoint: subscription.endpoint,
-    keys: subscription.keys,
+    keys: {
+      p256dh: subscription.p256dh,
+      auth: subscription.auth,
+    },
   }),
 };

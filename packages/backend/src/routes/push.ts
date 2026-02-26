@@ -70,6 +70,6 @@ pushRouter.post('/trigger/:trafficId', async (c) => {
 
 // Get VAPID public key
 pushRouter.get('/vapid-key', (c) => {
-  const vapidKey = pushService.getVapidPublicKey();
+  const vapidKey = pushService.getVapidPublicKeySync();
   return c.json({ vapidKey });
 });

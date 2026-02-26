@@ -1,12 +1,15 @@
-interface TrafficEvent {
-  id: string;
+import { getDatabase, trafficEvents, type TrafficEvent } from '../db/index.js';
+import { eq, desc, sql, count } from 'drizzle-orm';
+
+const db = getDatabase();
+
+interface CaptureTrafficInput {
   url: string;
   method: string;
   headers?: Record<string, string>;
   body?: unknown;
   source: string;
   metadata?: Record<string, unknown>;
-  createdAt: Date;
 }
 
 interface TrafficStats {
@@ -16,50 +19,99 @@ interface TrafficStats {
   topUrls: Array<{ url: string; count: number }>;
 }
 
-// In-memory storage
-const trafficEvents = new Map<string, TrafficEvent>();
-
 export const trafficService = {
-  capture: async (data: Omit<TrafficEvent, 'id' | 'createdAt'>): Promise<TrafficEvent> => {
-    const event: TrafficEvent = {
+  capture: async (data: CaptureTrafficInput): Promise<TrafficEvent> => {
+    const newEvent = {
       id: crypto.randomUUID(),
-      ...data,
+      url: data.url,
+      method: data.method,
+      headers: data.headers,
+      body: data.body,
+      source: data.source,
+      metadata: data.metadata,
       createdAt: new Date(),
     };
-    trafficEvents.set(event.id, event);
-    return event;
+
+    const result = await db
+      .insert(trafficEvents)
+      .values(newEvent)
+      .returning();
+
+    return result[0];
   },
 
   getAll: async (limit = 100, offset = 0): Promise<TrafficEvent[]> => {
-    return Array.from(trafficEvents.values())
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .slice(offset, offset + limit);
+    const result = await db
+      .select()
+      .from(trafficEvents)
+      .orderBy(desc(trafficEvents.createdAt))
+      .limit(limit)
+      .offset(offset);
+    return result;
   },
 
   getById: async (id: string): Promise<TrafficEvent | undefined> => {
-    return trafficEvents.get(id);
+    const result = await db
+      .select()
+      .from(trafficEvents)
+      .where(eq(trafficEvents.id, id))
+      .limit(1);
+    return result[0];
   },
 
   getStats: async (): Promise<TrafficStats> => {
-    const events = Array.from(trafficEvents.values());
+    // Get total count
+    const totalResult = await db
+      .select({ count: count() })
+      .from(trafficEvents);
+    const total = totalResult[0]?.count || 0;
+
+    // Get stats by method using SQL aggregation
+    const byMethodResult = await db
+      .select({
+        method: trafficEvents.method,
+        count: count(),
+      })
+      .from(trafficEvents)
+      .groupBy(trafficEvents.method);
 
     const byMethod: Record<string, number> = {};
-    const bySource: Record<string, number> = {};
-    const urlCounts: Record<string, number> = {};
-
-    for (const event of events) {
-      byMethod[event.method] = (byMethod[event.method] || 0) + 1;
-      bySource[event.source] = (bySource[event.source] || 0) + 1;
-      urlCounts[event.url] = (urlCounts[event.url] || 0) + 1;
+    for (const row of byMethodResult) {
+      byMethod[row.method] = row.count;
     }
 
-    const topUrls = Object.entries(urlCounts)
-      .map(([url, count]) => ({ url, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
+    // Get stats by source
+    const bySourceResult = await db
+      .select({
+        source: trafficEvents.source,
+        count: count(),
+      })
+      .from(trafficEvents)
+      .groupBy(trafficEvents.source);
+
+    const bySource: Record<string, number> = {};
+    for (const row of bySourceResult) {
+      bySource[row.source] = row.count;
+    }
+
+    // Get top URLs
+    const topUrlsResult = await db
+      .select({
+        url: trafficEvents.url,
+        count: count(),
+      })
+      .from(trafficEvents)
+      .groupBy(trafficEvents.url)
+      .orderBy(desc(count()))
+      .limit(10);
+
+    const topUrls = topUrlsResult.map(row => ({
+      url: row.url,
+      count: row.count,
+    }));
 
     return {
-      total: events.length,
+      total,
       byMethod,
       bySource,
       topUrls,
@@ -67,10 +119,14 @@ export const trafficService = {
   },
 
   delete: async (id: string): Promise<boolean> => {
-    return trafficEvents.delete(id);
+    const result = await db
+      .delete(trafficEvents)
+      .where(eq(trafficEvents.id, id))
+      .returning();
+    return result.length > 0;
   },
 
   clear: async (): Promise<void> => {
-    trafficEvents.clear();
+    await db.delete(trafficEvents);
   },
 };
