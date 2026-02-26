@@ -1,0 +1,21 @@
+{
+  "name": "push-capture",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Traffic capture to webpush notification subscriptions platform",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
