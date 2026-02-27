@@ -1,0 +1,39 @@
+[     448ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/analytics/campaign-performance?days=30:0
+[    1452ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/analytics/campaign-performance?days=30:0
+[  149568ms] [ERROR] [vite] SyntaxError: The requested module '/node_modules/.vite/deps/@fortawesome_free-brands-svg-icons.js?v=1f8ec03b' does not provide an export named 'faCopy' @ http://localhost:5173/@vite/client:881
+[  149568ms] [ERROR] [vite] Failed to reload /src/pages/Subscriptions.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:881
+[  478396ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/analytics/campaign-performance?days=30:0
+[  479402ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/analytics/campaign-performance?days=30:0
+[  804703ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/devices:0
+[  805711ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/devices:0
+[  823610ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/settings/grouped:0
+[  824617ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/settings/grouped:0
+[  884288ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/devices:0
+[ 1009167ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/campaigns/stats:0
+[ 1010174ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/campaigns/stats:0
+[ 1010615ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/analytics/campaign-performance?days=30:0
+[ 1011625ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/analytics/campaign-performance?days=30:0
+[ 1205020ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/devices:0
+[ 1207188ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/campaigns/stats:0
+[ 1208200ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/campaigns/stats:0
+[ 1219523ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/subscriptions:0
+[ 1220534ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/subscriptions:0
+[ 1222445ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/traffic/stats/summary:0
+[ 1222455ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/subscriptions:0
+[ 1223453ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/traffic/stats/summary:0
+[ 1223467ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/subscriptions:0
+[ 1224051ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/traffic?limit=100&offset=0:0
+[ 1224606ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/devices:0
+[ 1224619ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/devices/stats:0
+[ 1225663ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/devices:0
+[ 1225664ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/devices/stats:0
+[ 1226364ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/traffic?limit=100&offset=0:0
+[ 1227368ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/traffic?limit=100&offset=0:0
+[ 4130700ms] [ERROR] [vite] SyntaxError: The requested module '/node_modules/.vite/deps/@fortawesome_free-solid-svg-icons.js?v=b6cb7e50' does not provide an export named 'faTachograph' @ http://localhost:5173/@vite/client:881
+[ 4130701ms] [ERROR] [vite] Failed to reload /src/components/Layout.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:881
+[ 4139769ms] [ERROR] [vite] ReferenceError: faTachograph is not defined
+    at http://localhost:5173/src/components/Layout.tsx?t=1772159353162:56:69 @ http://localhost:5173/@vite/client:881
+[ 4139769ms] [ERROR] [vite] Failed to reload /src/components/Layout.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:881
+[ 4182795ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/components/analytics/charts/Charts.tsx:0
+[ 4182796ms] [ERROR] [vite] Failed to reload /src/App.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:881
+[ 4185236ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/components/analytics/charts/Charts.tsx:0

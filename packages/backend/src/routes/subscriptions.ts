@@ -1,4 +1,8 @@
+import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
+import { db } from '../db/index.js';
+import { subscriptions } from '../db/schema.js';
+import { analyticsService } from '../services/analytics.js';
 import { subscriptionService } from '../services/subscription.js';
 
 export const subscriptionsRouter = new Hono();
@@ -61,4 +65,50 @@ subscriptionsRouter.patch('/:id/status', async (c) => {
   }
 
   return c.json({ subscription });
+});
+
+// Handle subscription refresh (from pushsubscriptionchange event)
+subscriptionsRouter.post('/refresh', async (c) => {
+  try {
+    const { oldEndpoint, newEndpoint, keys } = await c.req.json();
+
+    if (!oldEndpoint || !newEndpoint || !keys) {
+      return c.json({ error: 'Missing required fields' }, 400);
+    }
+
+    // Find old subscription
+    const oldSubs = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.endpoint, oldEndpoint))
+      .limit(1);
+
+    if (oldSubs.length === 0) {
+      return c.json({ error: 'Old subscription not found' }, 404);
+    }
+
+    const oldSub = oldSubs[0];
+
+    // Update with new endpoint and keys
+    await db
+      .update(subscriptions)
+      .set({
+        endpoint: newEndpoint,
+        p256dh: keys.p256dh,
+        auth: keys.auth,
+        status: 'active',
+        updatedAt: new Date(),
+      })
+      .where(eq(subscriptions.id, oldSub.id));
+
+    // Track refresh event
+    await analyticsService.trackSubscriptionRefresh(oldEndpoint, newEndpoint);
+
+    return c.json({ success: true, subscriptionId: oldSub.id });
+  } catch (error) {
+    return c.json(
+      { error: error instanceof Error ? error.message : 'Failed to refresh subscription' },
+      500
+    );
+  }
 });

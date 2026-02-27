@@ -1,7 +1,5 @@
-import { getDatabase, trafficEvents, type TrafficEvent } from '../db/index.js';
-import { eq, desc, sql, count } from 'drizzle-orm';
-
-const db = getDatabase();
+import { count, desc, eq } from 'drizzle-orm';
+import { db, type TrafficEvent, trafficEvents } from '../db/index.js';
 
 interface CaptureTrafficInput {
   url: string;
@@ -32,10 +30,7 @@ export const trafficService = {
       createdAt: new Date(),
     };
 
-    const result = await db
-      .insert(trafficEvents)
-      .values(newEvent)
-      .returning();
+    const result = await db.insert(trafficEvents).values(newEvent).returning();
 
     return result[0];
   },
@@ -51,19 +46,13 @@ export const trafficService = {
   },
 
   getById: async (id: string): Promise<TrafficEvent | undefined> => {
-    const result = await db
-      .select()
-      .from(trafficEvents)
-      .where(eq(trafficEvents.id, id))
-      .limit(1);
+    const result = await db.select().from(trafficEvents).where(eq(trafficEvents.id, id)).limit(1);
     return result[0];
   },
 
   getStats: async (): Promise<TrafficStats> => {
     // Get total count
-    const totalResult = await db
-      .select({ count: count() })
-      .from(trafficEvents);
+    const totalResult = await db.select({ count: count() }).from(trafficEvents);
     const total = totalResult[0]?.count || 0;
 
     // Get stats by method using SQL aggregation
@@ -105,7 +94,7 @@ export const trafficService = {
       .orderBy(desc(count()))
       .limit(10);
 
-    const topUrls = topUrlsResult.map(row => ({
+    const topUrls = topUrlsResult.map((row) => ({
       url: row.url,
       count: row.count,
     }));
@@ -119,10 +108,7 @@ export const trafficService = {
   },
 
   delete: async (id: string): Promise<boolean> => {
-    const result = await db
-      .delete(trafficEvents)
-      .where(eq(trafficEvents.id, id))
-      .returning();
+    const result = await db.delete(trafficEvents).where(eq(trafficEvents.id, id)).returning();
     return result.length > 0;
   },
 

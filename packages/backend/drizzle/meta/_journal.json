@@ -8,6 +8,27 @@
       "when": 1772139266307,
       "tag": "0000_vengeful_husk",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1772148599887,
+      "tag": "0001_petite_nico_minoru",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1772150179848,
+      "tag": "0002_round_stellaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1772157134712,
+      "tag": "0003_salty_morg",
+      "breakpoints": true
     }
   ]
 }

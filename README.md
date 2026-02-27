@@ -9,12 +9,13 @@ This is a monorepo using Turborepo with the following packages:
 ### Backend (`@push-capture/backend`)
 - **Framework**: Hono (ultra-fast web framework)
 - **Runtime**: Node.js / Bun
+- **Database**: PostgreSQL 16 with Drizzle ORM
 - **Port**: 3001
 - **Features**:
   - Subscription management API
   - Traffic capture endpoints
   - Web push notification delivery
-  - VAPID key management
+  - VAPID key management (stored in database)
 
 ### Admin Dashboard (`@push-capture/admin-dashboard`)
 - **Framework**: React + Vite
@@ -37,16 +38,27 @@ This is a monorepo using Turborepo with the following packages:
 
 ### Prerequisites
 - Node.js >= 20
-- pnpm (recommended) or npm
+- Docker and Docker Compose (for PostgreSQL)
+- npm
 
-### Installation
+### Quick Start
 
 ```bash
-# Install dependencies
-pnpm install
+# Start PostgreSQL
+docker compose up -d
 
-# Set up environment variables
-cp packages/backend/.env.example packages/backend/.env
+# Install dependencies
+npm install
+
+# Run database migrations
+cd packages/backend
+npm run db:migrate
+
+# Seed initial VAPID config
+npm run db:seed
+
+# Start backend
+npm run dev
 ```
 
 ### Generate VAPID Keys
@@ -55,29 +67,80 @@ cp packages/backend/.env.example packages/backend/.env
 npx web-push generate-vapid-keys
 ```
 
-Add the generated keys to `packages/backend/.env`:
+Update the VAPID config in the database or via `packages/backend/.env`:
 ```
 VAPID_PUBLIC_KEY=your_public_key
 VAPID_PRIVATE_KEY=your_private_key
 VAPID_SUBJECT=mailto:your-email@example.com
 ```
 
-### Development
+### Database Management
 
 ```bash
-# Start all services (requires turbo)
-pnpm dev
+# Generate migrations from schema changes
+npm run db:generate
 
-# Or start individually:
-# Backend
-cd packages/backend && pnpm dev
+# Apply migrations
+npm run db:migrate
 
-# Admin Dashboard
-cd packages/admin-dashboard && pnpm dev
+# Open Drizzle Studio (database GUI)
+npm run db:studio
 
-# Subscriber Landing
-cd packages/subscriber-landing && pnpm dev
+# Seed database
+npm run db:seed
 ```
+
+### Development
+
+Start each service individually:
+
+```bash
+# Backend (port 3001)
+cd packages/backend && npm run dev
+
+# Admin Dashboard (port 5173)
+cd packages/admin-dashboard && npm run dev
+
+# Subscriber Landing (port 5174)
+cd packages/subscriber-landing && npm run dev
+```
+
+## Database Schema
+
+### `subscriptions` - Web push subscriptions
+| Column | Type |
+|--------|------|
+| id | text (PK) |
+| endpoint | text (unique) |
+| p256dh | text |
+| auth | text |
+| userAgent | text |
+| metadata | jsonb |
+| status | enum (active, inactive, failed) |
+| createdAt | timestamp |
+| updatedAt | timestamp |
+
+### `traffic_events` - Captured HTTP traffic
+| Column | Type |
+|--------|------|
+| id | text (PK) |
+| url | text |
+| method | text |
+| headers | jsonb |
+| body | jsonb |
+| source | text |
+| metadata | jsonb |
+| createdAt | timestamp |
+
+### `vapid_config` - VAPID keys (singleton)
+| Column | Type |
+|--------|------|
+| id | text (PK) |
+| publicKey | text |
+| privateKey | text |
+| subject | text |
+| createdAt | timestamp |
+| updatedAt | timestamp |
 
 ## API Endpoints
 
@@ -94,7 +157,7 @@ cd packages/subscriber-landing && pnpm dev
 
 ### Traffic
 - `POST /api/traffic/capture` - Capture traffic event
-- `GET /api/traffic` - List captured traffic
+- `GET /api/traffic` - List captured traffic (with pagination)
 - `GET /api/traffic/stats/summary` - Get traffic statistics
 - `GET /api/traffic/:id` - Get traffic event by ID
 

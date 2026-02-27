@@ -16,8 +16,7 @@ pushRouter.post('/send/:subscriptionId', async (c) => {
     title,
     body,
     icon,
-    data,
-    url,
+    data: url ? { ...data, url } : data,
   });
 
   if (!result.success) {
@@ -35,14 +34,15 @@ pushRouter.post('/broadcast', async (c) => {
     return c.json({ error: 'Title is required' }, 400);
   }
 
-  const result = await pushService.broadcast({
-    title,
-    body,
-    icon,
-    data,
-    url,
-    filter,
-  });
+  const result = await pushService.broadcast(
+    {
+      title,
+      body,
+      icon,
+      data: url ? { ...data, url } : data,
+    },
+    filter
+  );
 
   return c.json({
     success: true,

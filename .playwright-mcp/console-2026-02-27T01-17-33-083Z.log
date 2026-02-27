@@ -1,0 +1,5 @@
+[     460ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/favicon.ico:0
+[     482ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/favicon.ico:0
+[   52386ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/api/push/send/https://fcm.googleapis.com/fcm/send/fUFawEhLALQ:APA91bE_Irels65sTD4jDjp61oT1TgQsj1Ycgldeo76YFKnm7IfZOUKtk1iCj1OTRwK1aYTFPqBqePKujU7N52Rdh_rlynVZ-h1W5-6U1Rt36Om9ZDftaOR6sO5GC2fA3pZWdIiCg4gF:0
+[   94441ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/settings/grouped:0
+[   95448ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/api/settings/grouped:0

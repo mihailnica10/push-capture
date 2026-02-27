@@ -4,11 +4,15 @@ import * as schema from './schema';
 
 // Create connection pool singleton
 let client: postgres.Sql | null = null;
-let db: ReturnType<typeof drizzle> | null = null;
+let dbInstance: ReturnType<typeof drizzle> | null = null;
 
-export function getDatabase() {
-  if (!db) {
-    const connectionString = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/push_capture';
+function getDatabase() {
+  if (!dbInstance) {
+    const connectionString = process.env.DATABASE_URL;
+
+    if (!connectionString) {
+      throw new Error('DATABASE_URL environment variable is required');
+    }
 
     client = postgres(connectionString, {
       max: 10,
@@ -16,7 +20,7 @@ export function getDatabase() {
       connect_timeout: 10,
     });
 
-    db = drizzle(client, { schema });
+    dbInstance = drizzle(client, { schema });
 
     // Graceful shutdown
     process.on('beforeExit', async () => {
@@ -40,8 +44,11 @@ export function getDatabase() {
     });
   }
 
-  return db;
+  return dbInstance;
 }
+
+// Export db instance for direct access
+export const db = getDatabase();
 
 // Re-export schema for convenience
 export * from './schema';

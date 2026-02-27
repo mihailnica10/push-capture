@@ -34,13 +34,9 @@ export function Traffic() {
                     <MethodBadge method={event.method} />
                   </td>
                   <td className="p-4">
-                    <code className="text-sm bg-gray-100 px-2 py-1 rounded">
-                      {event.url}
-                    </code>
+                    <code className="text-sm bg-gray-100 px-2 py-1 rounded">{event.url}</code>
                   </td>
-                  <td className="p-4 text-gray-600 text-sm">
-                    {event.source}
-                  </td>
+                  <td className="p-4 text-gray-600 text-sm">{event.source}</td>
                   <td className="p-4 text-gray-600 text-sm">
                     {new Date(event.createdAt).toLocaleString()}
                   </td>
@@ -67,9 +63,5 @@ function MethodBadge({ method }: { method: string }) {
 
   const style = styles[method] || 'bg-gray-100 text-gray-700';
 
-  return (
-    <span className={`px-2 py-1 rounded text-xs font-bold ${style}`}>
-      {method}
-    </span>
-  );
+  return <span className={`px-2 py-1 rounded text-xs font-bold ${style}`}>{method}</span>;
 }

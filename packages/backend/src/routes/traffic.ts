@@ -21,8 +21,8 @@ trafficRouter.post('/capture', async (c) => {
 
 // Get all captured traffic (admin)
 trafficRouter.get('/', async (c) => {
-  const limit = parseInt(c.req.query('limit') || '100');
-  const offset = parseInt(c.req.query('offset') || '0');
+  const limit = parseInt(c.req.query('limit') || '100', 10);
+  const offset = parseInt(c.req.query('offset') || '0', 10);
   const traffic = await trafficService.getAll(limit, offset);
   return c.json({ traffic });
 });

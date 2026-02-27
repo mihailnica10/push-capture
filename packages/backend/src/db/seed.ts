@@ -1,26 +1,30 @@
-import { getDatabase, vapidConfig } from './index';
 import { eq } from 'drizzle-orm';
-
-const db = getDatabase();
+import { db, vapidConfig } from './index.js';
+import { logger } from '../lib/logger.js';
 
 async function seed() {
-  console.log('🌱 Seeding database...');
+  logger.info('Starting database seed...');
 
   // Check if VAPID config already exists
   const existing = await db.select().from(vapidConfig).where(eq(vapidConfig.id, 'default'));
 
   if (existing.length > 0) {
-    console.log('✅ VAPID config already exists, skipping seed');
+    logger.info('VAPID config already exists, skipping seed');
     return;
   }
 
-  // Get VAPID keys from environment or generate placeholder
-  const publicKey = process.env.VAPID_PUBLIC_KEY || 'BEl62iUYgUivxIkv69yViEuiBIa-Ib47JZv3f4NY_1Iq0ggB7c2ZPYY8vI5zDZbNLGvY3vFvqKVgB7qLw6RGkF8';
-  const privateKey = process.env.VAPID_PRIVATE_KEY || 'YOUR_PRIVATE_KEY_HERE';
-  const subject = process.env.VAPID_SUBJECT || 'mailto:admin@example.com';
+  // Validate required environment variables
+  const publicKey = process.env.VAPID_PUBLIC_KEY;
+  const privateKey = process.env.VAPID_PRIVATE_KEY;
+  const subject = process.env.VAPID_SUBJECT;
 
-  if (privateKey === 'YOUR_PRIVATE_KEY_HERE') {
-    console.warn('⚠️  Using placeholder VAPID keys. Generate real keys with: npx web-push generate-vapid-keys');
+  if (!publicKey || !privateKey || !subject) {
+    logger.error(
+      { hasPublicKey: !!publicKey, hasPrivateKey: !!privateKey, hasSubject: !!subject },
+      'Missing required VAPID environment variables. Set VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, and VAPID_SUBJECT.'
+    );
+    logger.error('Generate keys with: npx web-push generate-vapid-keys');
+    process.exit(1);
   }
 
   // Insert VAPID config
@@ -31,10 +35,10 @@ async function seed() {
     subject,
   });
 
-  console.log('✅ Seed completed');
+  logger.info('Database seed completed successfully');
 }
 
 seed().catch((error) => {
-  console.error('❌ Seed failed:', error);
+  logger.error({ error }, 'Database seed failed');
   process.exit(1);
 });
